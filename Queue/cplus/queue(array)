@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 3
+
+typedef int Data;
+
+class queue{
+private:
+	int rear;
+	int front;
+	Data buffer[MAX];
+public:
+	queue();
+	bool isempty();
+	bool isfull();
+	void enqueue(Data data);
+	bool dequeue(Data *data);
+};
+
+int main()
+{
+	queue q1;
+	Data del_data = 0;
+	
+
+	q1.enqueue(3);
+	q1.enqueue(4);
+	
+	q1.dequeue(&del_data);
+	q1.enqueue(2);
+	
+	
+
+	return 0;
+}
+
+
+queue::queue()
+{
+	rear = 0;
+	front = 0;
+
+	memset(buffer,0,sizeof(buffer));	
+}
+
+
+
+bool queue::isempty()
+{
+	if(rear == front)
+		return true;
+	return false;
+}
+
+bool queue::isfull()
+{
+	if(((rear+1) % MAX) == front)
+		return true;
+	return false;
+}
+
+void queue::enqueue(Data data)
+{
+	if(isfull())
+		return;
+	rear = (rear+1) % MAX;
+	buffer[rear] = data;
+}
+
+bool queue::dequeue(Data *data)
+{
+	if(isempty())
+		return false;
+	front = (front+1) % MAX;
+	*data = buffer[front];
+
+	return true;
+}
+
