@@ -1,0 +1,59 @@
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <stdlib.h>
+
+void Draw();
+void myKeyboard(unsigned char keypressed,int x,int y);
+
+int main(int argc,char **argv)
+{
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_RGB);
+	glutInitWindowSize(300,300);
+	glutInitWindowPosition(0,0);
+	
+	glutCreateWindow("Creat Triple");
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);	
+	//enroll callback
+	glutDisplayFunc(Draw);
+	glutKeyboardFunc(myKeyboard);
+
+	glutMainLoop();
+	return 0;
+}
+
+void Draw()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.5,0.5,0.5);		
+	
+	glBegin(GL_POLYGON);			
+			glVertex3f(-0.5, -0.5, 0);
+			glVertex3f(0.5,-0.5, 0);
+			glVertex3f(0.5, 0.5, 0);
+			glVertex3f(-0.5, 0.5, 0);						
+	glEnd();	
+
+	glFlush();
+}
+
+
+void myKeyboard(unsigned char keypressed,int x,int y)
+{
+	switch(keypressed){
+		case 'Q':
+			exit(0);
+			break;
+		case 'q':
+			exit(0);
+			break;
+		case 27:
+			exit(0);
+			break;
+	}
+}
