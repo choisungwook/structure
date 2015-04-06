@@ -1,9 +1,8 @@
 #include <gl/glut.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
-#define WINDOW_SIZE 1000
-#define FWINDOW_SIZE 1000.0
-#define ARRAY_MAX 10000
+#define WINDOW_SIZE 500
+#define FWINDOW_SIZE 500.0
 
 typedef struct MY_POINTS{
 	GLint TopLeftX;
@@ -12,13 +11,7 @@ typedef struct MY_POINTS{
 	GLint BottomRightX;
 }MY_POINTS;
 
-typedef struct Mangager{
-	MY_POINTS buffer[ARRAY_MAX];
-	int buffer_index;	
-}Manager;
-
-GLint TopLeftX, TopLeftY, BottomRightX, BottomRightY;
-Manager manager[ARRAY_MAX]; int manager_index = 1;
+MY_POINTS buffer[10000]; int buffer_len;
 
 //function
 void MyDisplay();
@@ -45,56 +38,47 @@ int main(int argc, char **argv)
 	glutMouseFunc(MyMouseClick);
 	glutMotionFunc(MyMouseMove);
 	glutMainLoop();
-	
+
 	return 0;
 }
 
 void MyDisplay()
 {
 	int i = 0;
-	int j = 0;
+
 	glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
-	
-	glClear(GL_COLOR_BUFFER_BIT); 
-	glColor3f(1.0, 0.0, 0.0);
-	glPointSize(4.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.1, 0.0, 0.0);
 	
 	
-	printf("%d\n", manager_index);
-	for (i = 0; i < manager_index; i++){
-		glBegin(GL_POINTS);
-		for (j = 0; j < manager[manager_index].buffer_index; j++){			
-			glVertex3f(manager[manager_index].buffer[j].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - manager[manager_index].buffer[j].BottomRightY) / FWINDOW_SIZE, 0.0);					
-		}
-		glEnd();
-		glFlush();
-	}
-	
-	
-	//glFlush();
 }
 
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
-{		
-	manager[manager_index].buffer_index = 0;	
+{
+	buffer_len = 0;
 
 	if (Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
-		TopLeftX = X;
-		TopLeftY = Y;
-		manager[manager_index].buffer[manager[manager_index].buffer_index].TopLeftX = X;
-		manager[manager_index].buffer[manager[manager_index].buffer_index].TopLeftY = Y;
+		buffer[buffer_len].TopLeftX = X;
+		buffer[buffer_len].TopLeftY = Y;
 	}
-	else if (State == GLUT_UP)
-		manager_index++;
-
+	else if (Button == GLUT_RIGHT_BUTTON && State == GLUT_DOWN){
+		glClear(GL_COLOR_BUFFER_BIT);
+		
+	}
 }
 
 void MyMouseMove(GLint X, GLint Y)
 {
-	BottomRightX = X;
-	BottomRightY = Y;
+	int i;
+	buffer[buffer_len].BottomRightX = X;
+	buffer[buffer_len++].BottomRightY = Y;
 
-	manager[manager_index].buffer[manager[manager_index].buffer_index].BottomRightX = X;
-	manager[manager_index].buffer[manager[manager_index].buffer_index++].BottomRightY = Y;
-	glutPostRedisplay();
+	glLineWidth(5);
+	glBegin(GL_LINE_STRIP);
+	for (i = 0; i<buffer_len; i++){
+		glVertex3f(buffer[i].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - buffer[i].BottomRightY) / FWINDOW_SIZE, 0.0);
+	}
+	glEnd();
+	glFlush();
+	
 }
