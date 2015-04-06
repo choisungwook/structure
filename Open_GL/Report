@@ -1,0 +1,88 @@
+#include <glut.h>
+#include <gl.h>
+#include <glu.h>
+#include <stdio.h>
+#define WINDOW_SIZE 500
+#define FWINDOW_SIZE 500.0
+#define BUFFER_SIZE 1000
+
+typedef struct MGL_POINTS{
+	GLint TopLeftX;
+	GLint TopLeftY;
+	GLint BottomRightX;
+	GLint BottomRightY;
+}DrawPoints;
+
+GLint TopLeftX, TopLeftY, BottomRightX, BottomRightY;
+int buffer_len = 1; DrawPoints buffer[BUFFER_SIZE];
+
+//function
+void MyDisplay();
+void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y);
+void MyMouseMove(GLint X, GLint Y);
+
+
+
+int main(int argc, char **argv)
+{
+	//초기화
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_RGB);
+	glutInitWindowSize(WINDOW_SIZE,WINDOW_SIZE);
+	glutInitWindowPosition(0,0);
+
+	//창생성
+	glutCreateWindow("5-7 source");
+	glClearColor(1.0,1.0,1.0,1.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
+	
+	//콜백함수 등록
+	glutDisplayFunc(MyDisplay);
+	glutMouseFunc(MyMouseClick);
+	glutMotionFunc(MyMouseMove);
+	glutMainLoop();
+	
+	return 0;
+}
+
+void MyDisplay()
+{
+	int i = 0;
+
+	glViewport(0,0,WINDOW_SIZE,WINDOW_SIZE);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glPointSize(10.0);
+	glColor3f(1.0,0.0,0.0);
+	glBegin(GL_POINTS);		
+	
+
+		for(i=1; i<buffer_len; i++){			
+			printf("%d %d %d %d\n",buffer[i].TopLeftX,buffer[i].TopLeftY,buffer[i].BottomRightX,buffer[i].BottomRightY);
+			glVertex3f(buffer[i].TopLeftX/FWINDOW_SIZE, (WINDOW_SIZE - buffer[i].TopLeftY)/FWINDOW_SIZE, 0.0);
+		}
+		
+	glEnd();
+	glFlush();
+}
+
+void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
+{
+	buffer_len = 1;
+	
+	if(Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
+		buffer[buffer_len].TopLeftX = X;
+		buffer[buffer_len].TopLeftY = Y;		
+		printf("%d %d\n",buffer[buffer_len].TopLeftX,buffer[buffer_len].TopLeftY);
+	}
+}
+
+void MyMouseMove(GLint X, GLint Y)
+{
+	buffer[buffer_len].BottomRightX = X;
+	buffer[buffer_len++].BottomRightY = Y;
+	
+	glutPostRedisplay();
+}
