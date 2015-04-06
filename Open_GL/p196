@@ -1,0 +1,64 @@
+#include <glut.h>
+#include <gl.h>
+#include <glu.h>
+#define WINDOW_SIZE 500
+
+GLint TopLeftX, TopLeftY, BottomRightX, BottomRightY;
+
+//function
+void MyDisplay();
+void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y);
+void MyMouseMove(GLint X, GLint Y);
+
+int main(int argc, char **argv)
+{
+	//초기화
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_RGB);
+	glutInitWindowSize(WINDOW_SIZE,WINDOW_SIZE);
+	glutInitWindowPosition(0,0);
+
+	//창생성
+	glutCreateWindow("5-7 source");
+	glClearColor(1.0,1.0,1.0,1.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
+	
+	//콜백함수 등록
+	glutDisplayFunc(MyDisplay);
+	glutMouseFunc(MyMouseClick);
+	glutMotionFunc(MyMouseMove);
+	glutMainLoop();
+	
+	return 0;
+}
+
+void MyDisplay()
+{
+	glViewport(0,0,WINDOW_SIZE,WINDOW_SIZE);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.5,0.5,0.5);
+	glBegin(GL_POLYGON);
+		glVertex3f(TopLeftX/WINDOW_SIZE, (WINDOW_SIZE-TopLeftY)/WINDOW_SIZE, 0.0);
+		glVertex3f(TopLeftX/WINDOW_SIZE, (WINDOW_SIZE-BottomRightY)/WINDOW_SIZE, 0.0);
+		glVertex3f(BottomRightX/WINDOW_SIZE, (WINDOW_SIZE-BottomRightY)/WINDOW_SIZE, 0.0);
+		glVertex3f(BottomRightX/WINDOW_SIZE, (WINDOW_SIZE-TopLeftY)/WINDOW_SIZE, 0.0);
+	glEnd();
+	glFlush();
+}
+
+void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
+{
+	if(Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
+		TopLeftX = X;
+		TopLeftY = Y;
+	}
+}
+
+void MyMouseMove(GLint X, GLint Y)
+{
+	BottomRightX = X;
+	BottomRightY = Y;
+	glutPostRedisplay();
+}
