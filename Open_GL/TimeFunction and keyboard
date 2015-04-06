@@ -1,0 +1,103 @@
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <stdio.h>
+#define MAX 500
+#define TIMER 300
+
+float step = -0.1;
+
+void Draw();
+void myReshape(int width, int height);
+float x1 = -0.5, y1 = -0.5;
+float x2 = 0.5, y2 = 0.5;
+void TimerFunction(int value);
+void keypressSpecial(int key, int x, int y);
+
+int main(int argc, char **argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB);
+	glutInitWindowSize(500, 500);
+	glutInitWindowPosition(0, 0);
+
+	glutCreateWindow("Creat Triple");
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+
+	//enroll callback
+	glutDisplayFunc(Draw);
+	glutReshapeFunc(myReshape);	
+	glutSpecialFunc(keypressSpecial);
+	glutTimerFunc(TIMER, TimerFunction, 1);	
+	glutMainLoop();
+	return 0;
+}
+
+void keypressSpecial(int key, int x, int y)
+{
+	switch (key){
+	case GLUT_KEY_LEFT:
+		x1 -= 0.2;
+		x2 -= 0.2;
+		break;
+	case GLUT_KEY_RIGHT:
+		x1 += 0.2;
+		x2 += 0.2;
+		break;
+	case GLUT_KEY_UP:
+		y1 += 0.1;
+		y2 += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		y1 -= 0.1;
+		y2 -= 0.1;
+		break;
+	}
+}
+
+void Draw()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.5, 0.5, 0.5);
+
+
+	glBegin(GL_POLYGON);
+	glVertex3f(x1, y1, 0);
+	glVertex3f(x2, y1, 0);
+	glVertex3f(x2, y2, 0);
+	glVertex3f(x1, y2, 0);
+	glEnd();
+
+	glFlush();
+}
+
+void myReshape(int width, int height)
+{
+	printf("width : %d height : %d\n", width, height);
+	glViewport(0, 0, width, height);
+	GLfloat widthFactor = (GLfloat)width / (GLfloat)500;
+	GLfloat heighFactor = (GLfloat)height / (GLfloat)500;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-1.0 * widthFactor, 1.0 *widthFactor, -1.0  * heighFactor, 1.0 * heighFactor, -1.0, 1.0);
+}
+
+void TimerFunction(int value)
+{	
+	if (x1 <= -1.0){
+		step = 0.1;
+		printf("bingo!!!!!\n");
+	}
+	if (x2 >= 1.0){
+		step = -0.1;
+		printf("bingo!!!!!\n");
+	}
+
+	x1 += step;
+	x2 += step;
+	printf("%f %f %f\n", x1, x2, step);
+	
+	glutPostRedisplay();
+	glutTimerFunc(TIMER, TimerFunction, 1);
+
+}
