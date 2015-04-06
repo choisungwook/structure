@@ -1,8 +1,9 @@
-#include <glut.h>
-#include <gl.h>
-#include <glu.h>
-#define WINDOW_SIZE 500
-#define FWINDOW_SIZE 500.0
+#include <gl/glut.h>
+#include <gl/gl.h>
+#include <gl/glu.h>
+#define WINDOW_SIZE 1000
+#define FWINDOW_SIZE 1000.0
+#define ARRAY_MAX 10000
 
 typedef struct MY_POINTS{
 	GLint TopLeftX;
@@ -11,16 +12,13 @@ typedef struct MY_POINTS{
 	GLint BottomRightX;
 }MY_POINTS;
 
-
-typedef struct POINTS_MANAGER{
-	MY_POINTS buffer[10000];
-	int buffer_len;
+typedef struct Mangager{
+	MY_POINTS buffer[ARRAY_MAX];
+	int buffer_index;	
 }Manager;
 
 GLint TopLeftX, TopLeftY, BottomRightX, BottomRightY;
-Manager manager[100]; int manager_index;
-
-
+Manager manager[ARRAY_MAX]; int manager_index = 1;
 
 //function
 void MyDisplay();
@@ -30,18 +28,18 @@ void MyMouseMove(GLint X, GLint Y);
 int main(int argc, char **argv)
 {
 	//초기화
-	glutInit(&argc,argv);
+	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB);
-	glutInitWindowSize(WINDOW_SIZE,WINDOW_SIZE);
-	glutInitWindowPosition(0,0);
+	glutInitWindowSize(WINDOW_SIZE, WINDOW_SIZE);
+	glutInitWindowPosition(0, 0);
 
 	//창생성
 	glutCreateWindow("5-7 source");
-	glClearColor(1.0,1.0,1.0,1.0);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
-	
+	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+
 	//콜백함수 등록
 	glutDisplayFunc(MyDisplay);
 	glutMouseFunc(MyMouseClick);
@@ -54,33 +52,49 @@ int main(int argc, char **argv)
 void MyDisplay()
 {
 	int i = 0;
-
-	glViewport(0,0,WINDOW_SIZE,WINDOW_SIZE);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0.1,0.0,0.0);
-	glPointSize(10.0);
-	glBegin(GL_POINTS);
-		for(i = 0; i<manager[manager_index].buffer_len; i++){			
-			glVertex3f(manager[manager_index].buffer[i].BottomRightX/FWINDOW_SIZE, (FWINDOW_SIZE-manager[manager_index].buffer[i].BottomRightY)/FWINDOW_SIZE, 0.0);
-		}		
-	glEnd();
-	glFlush();
+	int j = 0;
+	glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
+	
+	glClear(GL_COLOR_BUFFER_BIT); 
+	glColor3f(1.0, 0.0, 0.0);
+	glPointSize(4.0);
+	
+	
+	printf("%d\n", manager_index);
+	for (i = 0; i < manager_index; i++){
+		glBegin(GL_POINTS);
+		for (j = 0; j < manager[manager_index].buffer_index; j++){			
+			glVertex3f(manager[manager_index].buffer[j].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - manager[manager_index].buffer[j].BottomRightY) / FWINDOW_SIZE, 0.0);					
+		}
+		glEnd();
+		glFlush();
+	}
+	
+	
+	//glFlush();
 }
 
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
-{
-	manager_index++;
-	manager[manager_index].buffer_len = 0;
+{		
+	manager[manager_index].buffer_index = 0;	
 
-	if(Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){		
-		manager[manager_index].buffer[manager[manager_index].buffer_len].TopLeftX = X;
-		manager[manager_index].buffer[manager[manager_index].buffer_len].TopLeftY = Y;		
+	if (Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
+		TopLeftX = X;
+		TopLeftY = Y;
+		manager[manager_index].buffer[manager[manager_index].buffer_index].TopLeftX = X;
+		manager[manager_index].buffer[manager[manager_index].buffer_index].TopLeftY = Y;
 	}
+	else if (State == GLUT_UP)
+		manager_index++;
+
 }
 
 void MyMouseMove(GLint X, GLint Y)
 {
-	manager[manager_index].buffer[manager[manager_index].buffer_len].BottomRightX = X;
-	manager[manager_index].buffer[manager[manager_index].buffer_len].BottomRightY = Y;	
+	BottomRightX = X;
+	BottomRightY = Y;
+
+	manager[manager_index].buffer[manager[manager_index].buffer_index].BottomRightX = X;
+	manager[manager_index].buffer[manager[manager_index].buffer_index++].BottomRightY = Y;
 	glutPostRedisplay();
 }
