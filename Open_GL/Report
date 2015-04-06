@@ -1,6 +1,6 @@
-#include <glut.h>
-#include <gl.h>
-#include <glu.h>
+#include <gl/glut.h>
+#include <gl/gl.h>
+#include <gl/glu.h>
 #define WINDOW_SIZE 500
 #define FWINDOW_SIZE 500.0
 
@@ -11,7 +11,6 @@ typedef struct MY_POINTS{
 	GLint BottomRightX;
 }MY_POINTS;
 
-GLint TopLeftX, TopLeftY, BottomRightX, BottomRightY;
 MY_POINTS buffer[10000]; int buffer_len;
 
 //function
@@ -22,24 +21,24 @@ void MyMouseMove(GLint X, GLint Y);
 int main(int argc, char **argv)
 {
 	//초기화
-	glutInit(&argc,argv);
+	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB);
-	glutInitWindowSize(WINDOW_SIZE,WINDOW_SIZE);
-	glutInitWindowPosition(0,0);
+	glutInitWindowSize(WINDOW_SIZE, WINDOW_SIZE);
+	glutInitWindowPosition(0, 0);
 
 	//창생성
 	glutCreateWindow("5-7 source");
-	glClearColor(1.0,1.0,1.0,1.0);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
-	
+	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+
 	//콜백함수 등록
 	glutDisplayFunc(MyDisplay);
 	glutMouseFunc(MyMouseClick);
 	glutMotionFunc(MyMouseMove);
 	glutMainLoop();
-	
+
 	return 0;
 }
 
@@ -47,36 +46,39 @@ void MyDisplay()
 {
 	int i = 0;
 
-	glViewport(0,0,WINDOW_SIZE,WINDOW_SIZE);
+	glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0.1,0.0,0.0);
-	glPointSize(10.0);
-	glBegin(GL_POINTS);
-		for(i = 0; i<buffer_len; i++){			
-			glVertex3f(buffer[i].BottomRightX/FWINDOW_SIZE, (FWINDOW_SIZE-buffer[i].BottomRightY)/FWINDOW_SIZE, 0.0);
-		}		
-	glEnd();
-	glFlush();
+	glColor3f(0.1, 0.0, 0.0);
+	
+	
 }
 
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
 {
 	buffer_len = 0;
 
-	if(Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
-		TopLeftX = X;
-		TopLeftY = Y;
+	if (Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
 		buffer[buffer_len].TopLeftX = X;
 		buffer[buffer_len].TopLeftY = Y;
+	}
+	else if (Button == GLUT_RIGHT_BUTTON && State == GLUT_DOWN){
+		glClear(GL_COLOR_BUFFER_BIT);
+		
 	}
 }
 
 void MyMouseMove(GLint X, GLint Y)
 {
-	BottomRightX = X;
-	BottomRightY = Y;
-
+	int i;
 	buffer[buffer_len].BottomRightX = X;
 	buffer[buffer_len++].BottomRightY = Y;
-	glutPostRedisplay();
+
+	glLineWidth(5);
+	glBegin(GL_LINE_STRIP);
+	for (i = 0; i<buffer_len; i++){
+		glVertex3f(buffer[i].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - buffer[i].BottomRightY) / FWINDOW_SIZE, 0.0);
+	}
+	glEnd();
+	glFlush();
+	
 }
