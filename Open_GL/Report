@@ -114,20 +114,9 @@ void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
 }
 
 void MyMouseMove(GLint X, GLint Y)
-{
-	int i;
+{	
 	buffer[buffer_len].BottomRightX = X;
 	buffer[buffer_len++].BottomRightY = Y;
-	
-	/*
-	glLineWidth(10);
-	glBegin(GL_LINE_STRIP);
-	for (i = 0; i<buffer_len; i++){
-		glVertex3f(buffer[i].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - buffer[i].BottomRightY) / FWINDOW_SIZE, 0.0);
-	}
-	glEnd();
-	glFlush();
-	*/
 
 	glutPostRedisplay();
 }
