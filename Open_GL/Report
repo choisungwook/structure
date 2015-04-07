@@ -1,6 +1,7 @@
 #include <gl/glut.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
+#include <stdio.h>
 #define WINDOW_SIZE 500
 #define FWINDOW_SIZE 500.0
 
@@ -12,11 +13,14 @@ typedef struct MY_POINTS{
 }MY_POINTS;
 
 MY_POINTS buffer[10000]; int buffer_len;
+float Red = 1.0, Green = 0.0, Blue = 0.0;
+int flag = 0;
 
 //function
 void MyDisplay();
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y);
 void MyMouseMove(GLint X, GLint Y);
+void MyMainMenu(int entryID);
 
 int main(int argc, char **argv)
 {
@@ -33,7 +37,17 @@ int main(int argc, char **argv)
 	glLoadIdentity();
 	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 
-	//콜백함수 등록
+	
+	//메뉴등록
+	GLint MyMainMenuID = glutCreateMenu(MyMainMenu);
+	glutAddMenuEntry("검은색",1);
+	glutAddMenuEntry("빨간색",2);
+	glutAddMenuEntry("파란색",3);
+	glutAddMenuEntry("초론색",4);
+	glutAddMenuEntry("초기화",5);	
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+
+	//콜백함수 등록		
 	glutDisplayFunc(MyDisplay);
 	glutMouseFunc(MyMouseClick);
 	glutMotionFunc(MyMouseMove);
@@ -42,15 +56,50 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+
+//메뉴
+void MyMainMenu(int entryID)
+{
+	if(entryID == 1){
+		Red = 0.0; Green = 0.0; Blue = 0.0;
+	}
+	else if(entryID == 2){
+		Red = 1.0; Green = 0.0; Blue = 0.0;
+	}
+	else if(entryID == 3){
+		Red = 0.0; Green = 0.0; Blue = 1.0;
+	}
+	else if(entryID == 4){
+		Red = 0.0; Green = 1.0; Blue = 0.0;
+	}
+	else if(entryID == 5){
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}			
+}
+
 void MyDisplay()
 {
 	int i = 0;
 
 	glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0.1, 0.0, 0.0);
+	if(flag == 0){
+		flag = 1;
+		glClear(GL_COLOR_BUFFER_BIT);	
+	}
 	
-	
+	glColor3f(Red, Green, Blue);
+
+	glLineWidth(10);
+	glBegin(GL_LINE_STRIP);
+	for (i = 0; i<buffer_len; i++){
+		glVertex3f(buffer[i].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - buffer[i].BottomRightY) / FWINDOW_SIZE, 0.0);
+	}
+	glEnd();
+	glFlush();
+
+
+	printf("%f %f %f\n",Red,Green,Blue);
 }
 
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
@@ -61,10 +110,7 @@ void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
 		buffer[buffer_len].TopLeftX = X;
 		buffer[buffer_len].TopLeftY = Y;
 	}
-	else if (Button == GLUT_RIGHT_BUTTON && State == GLUT_DOWN){
-		glClear(GL_COLOR_BUFFER_BIT);
-		
-	}
+	
 }
 
 void MyMouseMove(GLint X, GLint Y)
@@ -72,13 +118,16 @@ void MyMouseMove(GLint X, GLint Y)
 	int i;
 	buffer[buffer_len].BottomRightX = X;
 	buffer[buffer_len++].BottomRightY = Y;
-
-	glLineWidth(5);
+	
+	/*
+	glLineWidth(10);
 	glBegin(GL_LINE_STRIP);
 	for (i = 0; i<buffer_len; i++){
 		glVertex3f(buffer[i].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - buffer[i].BottomRightY) / FWINDOW_SIZE, 0.0);
 	}
 	glEnd();
 	glFlush();
-	
+	*/
+
+	glutPostRedisplay();
 }
