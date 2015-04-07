@@ -4,6 +4,7 @@
   3) Mouse Event  --> MyMouse()
   4) Mouse Motion Event --> MyMouseMove() --> GlutPostRedisplay()
   5) Display Event
+  6) Passive Motion --> 이예제는 무시함
   
 5-8 메뉴콜백
 5-9 계양식메뉴
