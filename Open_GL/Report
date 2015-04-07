@@ -97,9 +97,7 @@ void MyDisplay()
 	}
 	glEnd();
 	glFlush();
-
-
-	printf("%f %f %f\n",Red,Green,Blue);
+	
 }
 
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
