@@ -1,3 +1,5 @@
+OPENGL 프로세스는 정해져있지만 Event 처리방식이기 때문에 거의 지켲지 않는다.
+
 5-7 마우스콜백
   1) Reshape Event  
   2) Display Event  (Reshape와 동시에 일어나지만 육안으로는 순서대로 발생하는 것처럼 느껴진다)   --> MyDisplay()
