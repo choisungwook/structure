@@ -1,8 +1,8 @@
 5-7 마우스콜백
-  1) Reshape Event 
-  2) Display Event  (Reshape와 동시에 일어나지만 육안으로는 순서대로 발생하는 것처럼 느껴진다)
-  3) Mouse Event
-  4) Mouse Motion Event
+  1) Reshape Event  
+  2) Display Event  (Reshape와 동시에 일어나지만 육안으로는 순서대로 발생하는 것처럼 느껴진다)   --> MyDisplay()
+  3) Mouse Event  --> MyMouse()
+  4) Mouse Motion Event --> MyMouseMove() --> GlutPostRedisplay()
   5) Display Event
   
 5-8 메뉴콜백
