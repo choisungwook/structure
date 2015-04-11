@@ -2,25 +2,81 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <stdio.h>
-#define WINDOW_SIZE 500
-#define FWINDOW_SIZE 500.0
+#include <iostream>
+#include <list>
+using namespace std;
 
-typedef struct MY_POINTS{
-	GLint TopLeftX;
-	GLint TopLeftY;
-	GLint BottomRightY;
-	GLint BottomRightX;
-}MY_POINTS;
+class POINTS{
+private:
+	GLint x;
+	GLint y;
+public:
+	POINTS(GLint x_pos, GLint y_pos){
+		x = x_pos;
+		y = y_pos;
+	}
+	POINTS();
+	GLint GetX(){
+		return  x;
+	}
+	GLint GetY(){
+		return  y;
+	}
+};
 
-MY_POINTS buffer[10000]; int buffer_len;
+class GLButton{
+private:
+	GLfloat RightX;
+	GLfloat TopY;
+	GLfloat LeftX;
+	GLfloat BottomY;
+public:
+	GLButton(GLfloat xPos, GLfloat yPos){
+		RightX = xPos;		
+		TopY = yPos;
+		LeftX = xPos - 0.1;		
+		BottomY = yPos + 0.1;
+	}
+	void SetPosition(GLfloat xPos, GLfloat yPos){
+		RightX = xPos;		
+		TopY = yPos;
+		LeftX = xPos - 0.1;
+		BottomY = yPos + 0.1;
+	}
+	GLfloat GetbottomY(){
+		return BottomY;
+	}
+	void draw(GLfloat Red,GLfloat Green, GLfloat Blue){	
+		glBegin(GL_POLYGON);
+		glColor3f(Red, Green, Blue);
+		glVertex3f((GLfloat)LeftX, (GLfloat)TopY, 0.0);
+		glVertex3f((GLfloat)LeftX, (GLfloat)BottomY, 0.0);
+		glVertex3f((GLfloat)RightX, (GLfloat)BottomY, 0.0);
+		glVertex3f((GLfloat)RightX, (GLfloat)TopY, 0.0);	
+		glEnd();
+		glFlush();
+	}
+};
+
+list<POINTS*>* Itemlist = new list<POINTS*>[1000];
+int itemIndex = -1;
+
+bool mouseDown = false;
 float Red = 1.0, Green = 0.0, Blue = 0.0;
-int flag = 0;
+GLint WINDOW_SIZE = 500; GLfloat FWINDOW_SIZE = 500.0;
+GLButton redButton(1.0, 0.9);
+GLButton blueButton(1.0, 0.8);
+GLButton greenButton(1.0, 0.7);
+GLButton blackButton(1.0, 0.6);
 
 //function
-void MyDisplay();
+void DrawMove();
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y);
 void MyMouseMove(GLint X, GLint Y);
 void MyMainMenu(int entryID);
+void OnReshape(int w, int h);
+void initScreen();
+void drawButton();
 
 int main(int argc, char **argv)
 {
@@ -31,90 +87,154 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(0, 0);
 
 	//창생성
-	glutCreateWindow("5-7 source");
+	glutCreateWindow("5-7 source");	
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-
 	
+
 	//메뉴등록
 	GLint MyMainMenuID = glutCreateMenu(MyMainMenu);
-	glutAddMenuEntry("검은색",1);
-	glutAddMenuEntry("빨간색",2);
-	glutAddMenuEntry("파란색",3);
-	glutAddMenuEntry("초론색",4);
-	glutAddMenuEntry("초기화",5);	
+	glutAddMenuEntry("검은색", 1);
+	glutAddMenuEntry("빨간색", 2);
+	glutAddMenuEntry("파란색", 3);
+	glutAddMenuEntry("초론색", 4);
+	glutAddMenuEntry("초기화", 5);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
-
+	
 	//콜백함수 등록		
-	glutDisplayFunc(MyDisplay);
 	glutMouseFunc(MyMouseClick);
 	glutMotionFunc(MyMouseMove);
+	glutDisplayFunc(DrawMove);
+	glutReshapeFunc(OnReshape);
+
 	glutMainLoop();
 
 	return 0;
 }
 
+void drawButton()
+{
+	redButton.draw(1.0,0.0,0.0);	
+	blueButton.draw(0.0,0.0,1.0);
+	greenButton.draw(0.0, 1.0, 0.0);
+	blackButton.draw(0.0,0.0,0.0);
+}
 
 //메뉴
 void MyMainMenu(int entryID)
 {
-	if(entryID == 1){
+	if (entryID == 1){
 		Red = 0.0; Green = 0.0; Blue = 0.0;
 	}
-	else if(entryID == 2){
+	else if (entryID == 2){
 		Red = 1.0; Green = 0.0; Blue = 0.0;
 	}
-	else if(entryID == 3){
+	else if (entryID == 3){
 		Red = 0.0; Green = 0.0; Blue = 1.0;
 	}
-	else if(entryID == 4){
+	else if (entryID == 4){
 		Red = 0.0; Green = 1.0; Blue = 0.0;
 	}
-	else if(entryID == 5){
-		glClearColor(1.0, 1.0, 1.0, 1.0);
+	else if (entryID == 5){
+		initScreen();
 		glClear(GL_COLOR_BUFFER_BIT);
-	}			
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glFlush();
+		drawButton();
+	}
 }
 
-void MyDisplay()
-{
-	int i = 0;
 
-	glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
-	if(flag == 0){
-		flag = 1;
-		glClear(GL_COLOR_BUFFER_BIT);	
-	}
-	
+void initScreen()
+{	
+	for (int i = 0; i < itemIndex + 1; i++){		
+		Itemlist[i].clear();		
+	}	
+}
+
+void drawLine()
+{	
 	glColor3f(Red, Green, Blue);
-
 	glLineWidth(10);
-	glBegin(GL_LINE_STRIP);
-	for (i = 0; i<buffer_len; i++){
-		glVertex3f(buffer[i].BottomRightX / FWINDOW_SIZE, (FWINDOW_SIZE - buffer[i].BottomRightY) / FWINDOW_SIZE, 0.0);
-	}
-	glEnd();
-	glFlush();
 	
+	for (int i = 0; i < itemIndex + 1; i++){
+		glBegin(GL_LINE_STRIP);
+		list<POINTS*>::iterator itemEnd = Itemlist[i].end();
+		for (list < POINTS* >::iterator itor = Itemlist[i].begin();
+			itor != itemEnd; itor++){
+			glVertex3f((*itor)->GetX(), (*itor)->GetY(), 0.0);
+		}
+		glEnd();		
+	}	
+}
+
+void DrawMove()
+{
+	if (itemIndex < 0)
+		return;
+
+	glColor3f(Red, Green, Blue);
+	glLineWidth(10);
+
+	glBegin(GL_LINE_STRIP);
+	list<POINTS*>::iterator itemEnd = Itemlist[itemIndex].end();
+	for (list < POINTS* >::iterator itor = Itemlist[itemIndex].begin();
+		itor != itemEnd; itor++){
+		glVertex3f((*itor)->GetX(), (*itor)->GetY(), 0.0);
+	}	
+	glEnd();
+		
+	glFlush();	
 }
 
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y)
 {
-	buffer_len = 0;
 
-	if (Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN){
-		buffer[buffer_len].TopLeftX = X;
-		buffer[buffer_len].TopLeftY = Y;
+	if (State == GLUT_DOWN){
+		if (Button == GLUT_LEFT_BUTTON){
+			itemIndex++;
+			mouseDown = true;
+		}
 	}
-	
+	else if (State == GLUT_UP){
+		mouseDown = false;
+	}
 }
 
 void MyMouseMove(GLint X, GLint Y)
-{	
-	buffer[buffer_len].BottomRightX = X;
-	buffer[buffer_len++].BottomRightY = Y;
-
+{
+	POINTS *saveItem = new POINTS(X, Y);
+	Itemlist[itemIndex].push_back(saveItem);
+	
 	glutPostRedisplay();
 }
+
+void OnReshape(int w, int h)
+{
+	
+	if (itemIndex == -1){		
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);		
+		glFlush();		
+	}
+	
+	// prevent division by zero when minising window
+	if (h == 0)
+		h = 1;
+	
+	// set the drawable region of the window
+	glViewport(0, 0, w, h);
+
+	// set up the projection matrix
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	drawButton();
+	// just use a perspective projection
+	glOrtho(0, w, h, 0, -100, 100);
+
+	if (itemIndex != -1 && mouseDown == false){
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		drawLine();		
+		glFlush();
+	}
+}
+
