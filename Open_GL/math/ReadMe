@@ -1,4 +1,12 @@
 1. y = x
 2. y = x^2
 3. y = sinx
+  -360 < x <360
+  -2pi < x <2pi
+  -6.28 < x <6.28
+  
+  radian = pi / 180
+  y = sin(x+radian);
+  glVertex3f(x,y)
+  
 4. 원
