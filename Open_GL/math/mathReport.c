@@ -1,214 +1,89 @@
 #include <stdio.h>
-#include <math.h>
-#include <gl/glut.h>
-#include <gl/gl.h>
-#include <gl/glu.h>
-#define SIZE 1000
-#define PI 3.141592
-#define START 7.0
-#define END -7.5
-#define LOOP 0.5
+#include <stdlib.h>
+#include <string.h>
+#define MAX 500000
 
-void Draw();
-void drawYX();
-void drawYXOfPoints();
-void drawSquartX();
-void drawSquartXOfPoints();
-void RdrawSquartX();
-void RdrawSquartXOfPoints();
-void drawSinx();
-void drawCircle();
-
-float x_w = 7.0, y_w = -7.0;
-int main(int argc, char **argv)
+typedef struct _NODE
 {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB);
-	glutInitWindowSize(SIZE, SIZE);
-	glutInitWindowPosition(0, 0);
+	int data;
+	struct _NODE *next;
+}NODE;
 
-	glutCreateWindow("y=x");
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+NODE* student[MAX];
+int visited[MAX];
+int recursive(int index,int cnt);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-x_w, x_w, y_w, -y_w, -1.0, 1.0);
+void create_node(int src,int data);
 
-	//콜백함수 등록
-	glutDisplayFunc(Draw);
 
-	glutMainLoop();
+int main()
+{
+	int total, couple;
+	int num1, num2;
+	int i;
+	int value = 1;
+	int result = 0;
+	//memset(student, 0, sizeof(student));
+	//memset(visited,0,sizeof(visited));
+	
+	scanf("%d %d", &total, &couple);
+
+	for(int i=0; i<couple; i++){
+		scanf("%d %d",&num1,&num2);
+		create_node(num1,num2);
+	}
+
+	
+	for(i=1; i<total+1; i++){
+		if( recursive(i,value) )
+			value++;
+	}
+
+	for(i=1; i<total+1; i++){
+		if(visited[i] == 0)
+			result++;
+	}
+
+	printf("%d\n",result+value-1);
 	return 0;
 }
 
-void Draw()
+int recursive(int index,int cnt)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	
+	NODE* cur = student[index];
+	
+	if(cur == NULL || visited[index] != 0)
+		return 0;
 
-	//세로축
-	glColor3f(0.5, 0.5, 0.5);
-	glLineWidth(5.0);
-	glBegin(GL_LINE_STRIP);
-	glVertex3f(x_w, 0.0, 0);
-	glVertex3f(y_w, 0.0, 0);
-	glEnd();
+	visited[index] = cnt;
+	
+	while( cur != NULL){
+		visited[cur->data] = cnt;
+		recursive(cur->data,cnt);
+		cur = cur->next;
+	}
 
-	//가로축
-	glColor3f(0.5, 0.5, 0.5);
-	glLineWidth(5.0);
-	glBegin(GL_LINE_STRIP);
-	glVertex3f(0.0, y_w, 0);
-	glVertex3f(0.0, x_w, 0);
-	glEnd();
-
-	//drawYXOfPoints();
-	//drawYX();
-	//drawSquartX(); // y = x^2 선
-	//drawSquartXOfPoints();; // y = x^2 점
-	//RdrawSquartX(); // y = -x^2 선
-	//RdrawSquartXOfPoints(); // y = -x^2 점
-	//drawSinx(); //사인함수
-	drawCircle();
-	glFlush();
+	return 1;
 }
 
-void drawYX()
+void create_node(int src,int data)
 {
-	float i;
+	NODE* new_node = (NODE*)malloc(sizeof(NODE));
+	new_node->data = data;
+	new_node->next = NULL;
+	
+	NODE* cur = student[src];
+	NODE* before = NULL;
 
-	glLineWidth(5.0);
-	glColor3f(0.0, 0.0, 1.0);
-	glBegin(GL_LINE_STRIP);
-	for (i = END; i <= START; i += 0.1){
-		glVertex3f(i, i, 0);
+	while(cur != NULL){
+		before = cur;
+		cur = cur->next;
 	}
-	glEnd();
-}
 
-void drawYXOfPoints()
-{
-	float i;
-	glPointSize(20.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_POINTS);
-	for (i = END; i <= START; i += LOOP){
-		glVertex3f(i, i, 0);
+	if(before == NULL)
+		student[src] = new_node;
+	else{
+		before->next = new_node;
 	}
-	glEnd();
-}
-
-// y = x^2 선
-void drawSquartX()
-{
-	float i;
-
-	glLineWidth(5.0);
-	glColor3f(0.5, 0.0, 1.0);
-	glBegin(GL_LINE_STRIP);
-	for (i = END; i <= START; i += 0.1){
-		glVertex3f(i, pow(i, 2), 0);
-	}
-	glEnd();
-}
-
-// y = -x^2 점
-void drawSquartXOfPoints()
-{
-	float i;
-
-	glPointSize(20.0);
-	glColor3f(0.2, 1.0, 0.5);
-	glBegin(GL_POINTS);
-	for (i = END; i <= START; i += LOOP){
-		glVertex3f(i, -pow(i, 2), 0);
-	}
-	glEnd();
-}
-
-// y = -x^2 선
-void RdrawSquartX()
-{
-	float i;
-
-	glLineWidth(5.0);
-	glColor3f(0.5, 0.0, 1.0);
-	glBegin(GL_LINE_STRIP);
-	for (i = START; i >= END; i -= 0.1){
-		glVertex3f(i, -pow(i, 2), 0);
-	}
-	glEnd();
-}
-
-// y = -x^2 점
-void RdrawSquartXOfPoints()
-{
-	float i;
-
-	glPointSize(20.0);
-	glColor3f(0.2, 1.0, 0.5);
-	glBegin(GL_POINTS);
-	for (i = END; i >= START; i -= LOOP){
-		glVertex3f(i, pow(i, 2), 0);
-	}
-	glEnd();
-}
-
-void drawSinx()
-{
-	float i;
-	int degree = 180;
-	float radian = degree * 3.141592 / 180;
-
-	glLineWidth(5.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
-	for (i = -6.8; i <= 6.8; i += 0.1){
-		glVertex3f(i, sin(i), 0);
-
-	}
-	glEnd();
-}
-
-void drawCircle()
-{
-	float x, y;
-	float r = 3.0;
-	int a = 3, b = 2;
-
-	glLineWidth(5.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
-	for (x = 0; x <= 3.0; x += 0.1){
-		y = sqrt(pow(r, 2) - pow(x, 2) );
-		glVertex3f(x+a, y+b, 0);				
-	}
-	glEnd();
-
-	glLineWidth(5.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
-	for (x = 0; x <= 3.0; x += 0.1){
-		y = sqrt(pow(r, 2) - pow(x, 2));
-		glVertex3f(x+a, -y+b, 0);		
-	}
-	glEnd();
-
-	glLineWidth(5.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
-	for (x = 0; x <= 3.0; x += 0.1){
-		y = sqrt(pow(r, 2) - pow(x, 2));
-		glVertex3f(-x+a, y+b, 0);
-		
-	}
-	glEnd();
-
-	glLineWidth(5.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
-	for (x = 0; x <= 3.0; x += 0.1){
-		y = sqrt(pow(r, 2) - pow(x, 2));
-		glVertex3f(-x+a, -y+b, 0);
-	}
-	glEnd();
 }
