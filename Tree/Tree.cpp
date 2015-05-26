@@ -1,106 +1,218 @@
 #include <iostream>
 using namespace std;
 
-typedef int Data;
 
+template <typename T>
 class NODE{
-public:
-	Data data;
-	NODE* Left;
-	NODE* Right;
-
-	NODE();
-	NODE(Data data);
+public :
+	NODE* Lnext;
+	NODE* Rnext;
+	T data;
+	NODE(T _data)
+	{
+		data = _data;
+		Lnext = NULL;
+		Rnext = NULL;
+	}
+	NODE()
+	{
+		Lnext = NULL;
+		Rnext = NULL;
+		data = 0;
+	}
+	NODE<T>* GetLeftNode()
+	{
+		return this->Lnext;
+	}
+	NODE<T>* GetRightNode()
+	{
+		return this->Rnext;
+	}
+	void makeLeftNode(NODE<T>* newNode)
+	{
+		this->Lnext = newNode;
+	}
+	void makeRightNode(NODE<T>* newNode)
+	{
+		this->Rnext = newNode;
+	}
+	void deleteNode(NODE<T>* delNode)
+	{
+		delete delNode;
+	}
+	void removeLeftNode()
+	{
+		this->Lnext = NULL;
+	}
+	void removeRightNode()
+	{
+		this->Rnext = NULL;
+	}
 };
 
-NODE::NODE()
+template <typename T>
+class BinaryTree : public NODE<T>
 {
-	this->Left = NULL;
-	this->Right = NULL;
-}
-
-NODE::NODE(Data data)
-{
-	this->data = data;
-	this->Left = NULL;
-	this->Right = NULL;
-}
-
-class Tree{
-private:
+public:
+	BinaryTree()
+	{
+		this->root = NULL;
+	}
 	NODE* root;
-public:
-	Tree();
-	void insert(NODE *new_node);
-	NODE* GetLeftchild(NODE* parent);
-	NODE* GetRightchild(NODE* parent);
-	void MakesubLeft(NODE *parent,NODE *child);
-	void MakesubRight(NODE *parent,NODE *child);
+	void insert(T data);
+	void preorder(NODE<T>* Root);
+	void inorder(NODE<T>* Root);
+	NODE<T>* remove(T delData);	
 };
 
-Tree::Tree()
+template <typename T>
+void BinaryTree<T>::preorder(NODE<T>* Root)
 {
-	root = NULL;
+	if (Root)
+	{
+		cout << Root->data << " ";
+		preorder(Root->GetLeftNode());
+		preorder(Root->GetRightNode());
+	}
 }
 
-NODE* Tree::GetLeftchild(NODE* parent)
+template <typename T>
+void BinaryTree<T>::inorder(NODE<T>* Root)
 {
-	return parent->Left;
+	if (Root)
+	{		
+		inorder(Root->GetLeftNode());
+		cout << Root->data << " ";
+		inorder(Root->GetRightNode());
+	}
 }
 
-NODE* Tree::GetRightchild(NODE* parent)
+template <typename T>
+void BinaryTree<T>::insert(T data)
 {
-	return parent->Right;
-}
+	NODE<T>* curNode = root;
+	NODE<T>* parentNode = NULL;
+	NODE<T>* newNode = NULL;
 
+	while (curNode != NULL)
+	{
+		if (data == curNode->data)
+			return;
 
-void Tree::MakesubLeft(NODE *parent,NODE *child)
-{
-	parent->Left = child;
-}
-
-void Tree::MakesubRight(NODE *parent,NODE *child)
-{
-	parent->Right = child;	
-}
-
-void Tree::insert(NODE *new_node)
-{
-	NODE* cur = root;
-	NODE* parent = NULL;
-
-	while( cur != NULL){
-		parent = cur;
-		
-		if(new_node->data > cur->data)
-			cur = GetRightchild(cur);
+		parentNode = curNode;
+		if (curNode->data > data)
+			curNode = curNode->GetLeftNode();
 		else
-			cur = GetLeftchild(cur);
+			curNode = curNode->GetRightNode();
 	}
 
-	if(parent){
-		if(parent->data > new_node->data)
-			MakesubLeft(parent,new_node);
+	newNode = new NODE<T>(data);
+
+	if (parentNode != NULL)
+	{
+		if (parentNode->data > data)
+			parentNode->makeLeftNode(newNode);
 		else
-			MakesubRight(parent,new_node);
+			parentNode->makeRightNode(newNode);
 	}
 	else
-		root = new_node;
+		this->root = newNode;
 }
 
-NODE* create_node(Data data)
+template <typename T>
+NODE<T>* BinaryTree<T>::remove(T delData)
 {
-	NODE* new_node = new NODE(data);
-	return new_node;
+	NODE<T>* virtualRoot = new NODE<T>(0);
+	NODE<T>* curNode = root;
+	NODE<T>* parentNode = virtualRoot;
+	NODE<T>* delNode = NULL;
+	
+	virtualRoot->makeRightNode(root);
+
+	while ((curNode != NULL) && (curNode->data != delData))
+	{
+		parentNode = curNode;
+
+		if (curNode->data > delData)
+			curNode = curNode->GetLeftNode();
+		else
+			curNode = curNode->GetRightNode();
+	}
+
+	if (curNode == NULL)
+		return NULL;
+	
+	delNode = curNode;
+
+	if ((delNode->GetLeftNode() == NULL) && (delNode->GetRightNode() == NULL))
+	{
+		if (parentNode->GetLeftNode() == delNode)
+			parentNode->removeLeftNode();
+		else
+			parentNode->removeRightNode();
+	}
+	else if (delNode->GetLeftNode() == NULL || delNode->GetRightNode() == NULL)
+	{
+		NODE<T>* delChildNode;
+
+		if (delNode->GetLeftNode() != NULL)
+			delChildNode = delNode->GetLeftNode();
+		else
+			delChildNode = delNode->GetRightNode();
+
+		if (parentNode->GetLeftNode() == delNode)
+			parentNode->makeLeftNode(delChildNode);
+		else
+			parentNode->makeRightNode(delChildNode);
+	}
+	else
+	{
+		NODE<T>* delparentNode = delNode;
+		NODE<T>* delChildNode = delNode->GetRightNode();
+		T delData;
+
+		while (delChildNode->GetLeftNode() != NULL)
+		{
+			delparentNode = delChildNode;
+			delChildNode = delChildNode->GetLeftNode();
+		}
+
+		delData = delNode->data;
+		delNode->data = delChildNode->data;
+
+		if (delparentNode->GetLeftNode() == delChildNode)
+			delparentNode->makeLeftNode(delChildNode->GetRightNode());
+		else
+			delparentNode->makeRightNode(delChildNode->GetRightNode());
+
+		delNode = delChildNode;
+		delChildNode->data = delData;
+	}
+
+	if (virtualRoot->GetRightNode() != root)
+		root = virtualRoot->GetRightNode();
+
+	delete virtualRoot;
+
+	return delNode;
 }
 
 int main()
 {
-	Tree t1;
+	BinaryTree<int> bt1;
 
-	t1.insert(create_node(12));
-	t1.insert(create_node(1));
-	t1.insert(create_node(17));
+	bt1.insert(3);
+
+	bt1.insert(1);
+	bt1.insert(2);
+	bt1.insert(4);
+	bt1.insert(5);
+		
+	bt1.inorder(bt1.root);
+	cout << endl;
+
+	bt1.remove(5);
+	bt1.inorder(bt1.root);
+	cout << endl;
 	return 0;
 }
-
