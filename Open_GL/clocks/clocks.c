@@ -33,6 +33,8 @@ typedef struct
 
 CIRCLE circle;
 
+//원을 그리는 함수
+//cos, sin함수를 이용해 1,2,3,4분면을 각각 그린다.
 void createcircle(int k, int r, int h) {
 	//glBegin(GL_LINES);
 	glBegin(GL_QUADS);
@@ -49,8 +51,6 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
-
-
 void MyDisplay(void){
 	int i;
 
@@ -61,8 +61,10 @@ void MyDisplay(void){
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
 
+	//시계테두리 원을 그린다
 	createcircle(100, 50, 100);	
-	glRectf(-0.0f, 1.0f, 0.5f, -0.5f);
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
 
 	//시계 시, 분, 초 눈금을 그리는 newLine함수를 호출하고
 	//5간격마다 구별을 하기 위해 해당 눈금은 빨간색으로 그린다.
