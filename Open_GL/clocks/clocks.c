@@ -135,7 +135,7 @@ int main(int argc, char* argv[]){
 	glutInitWindowSize(windowWidth, windowHeight);
 	glutInitWindowPosition(0, 0);
 
-	glutCreateWindow("code 6-13 page 274");
+	glutCreateWindow("20094422 최성욱 시계바늘 레포트");
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
