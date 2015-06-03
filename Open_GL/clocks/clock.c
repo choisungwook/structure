@@ -8,6 +8,8 @@
 #define M_PI 3.14
 
 const int windowWidth = 600, windowHeight = 600;
+const int scaleX = 0, scaleY = 40;
+
 const float clockR = 80.0f, clockVol = 100.0f, angle1min = M_PI / 30.0f,
 			minStart = 0.9f, minEnd = 1.0f, stepStart = 0.8f, stepEnd = 1.0f;
 
@@ -21,8 +23,9 @@ float angleHour = 0, angleMin = 0, angleSec = 0;
 //회전하면서 눈금을 그린다.
 void newLine(float rStart, float rEnd, float angle){
 	float c = cos(angle) / 2, s = sin(angle) / 2;
-	glVertex2f(clockR*rStart*c, clockR*rStart*s);
-	glVertex2f(clockR*rEnd*c, clockR*rEnd*s);
+
+	glVertex2f(clockR*rStart*c + scaleX, clockR*rStart*s + scaleY);
+	glVertex2f(clockR*rEnd*c + scaleX, clockR*rEnd*s + scaleY);
 }
 
 typedef struct
@@ -35,17 +38,17 @@ CIRCLE circle;
 
 //원을 그리는 함수
 //cos, sin함수를 이용해 1,2,3,4분면을 각각 그린다.
-void createcircle(int k, int r, int h) {
+void createcircle(int k, int r, int h) {	
 	//glBegin(GL_LINES);
 	glBegin(GL_QUADS);
 	for (float i = 0; i < 180; i++)
 	{
-		circle.x = r * cos(i) - h;
-		circle.y = r * sin(i) + k;
-		glVertex3f(circle.x + k, circle.y - h, 0);
+		circle.x = r * cos(i) - h + scaleX;
+		circle.y = r * sin(i) + k + scaleY;
+		glVertex3f(circle.x + k , circle.y - h, 0);
 
-		circle.x = r * cos(i + 0.1) - h;
-		circle.y = r * sin(i + 0.1) + k;
+		circle.x = r * cos(i + 0.1) - h + scaleX;
+		circle.y = r * sin(i + 0.1) + k + scaleY;
 		glVertex3f(circle.x + k, circle.y - h, 0);
 	}
 	glEnd();
