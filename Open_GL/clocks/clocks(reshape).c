@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define M_PI 3.14
+#define DEGINRAD 3.14 / 180
+
+
 
 typedef struct
 {
@@ -15,6 +18,7 @@ typedef struct
 
 
 const int windowWidth = 600, windowHeight = 600;
+const int dx = 0, dy = -60;
 const int scaleX = 0, scaleY = 40;
 const float  watchTop = -50.0, watchBot = -10.0f;
 const int watchline = watchTop - watchBot;
@@ -56,21 +60,26 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
-void drawCircle(float radius)
-{
+void drawCircle(const float r){
+	glColor3f(0.0, 0.0, 1.0);
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 0.0);
+
 	glBegin(GL_LINE_LOOP);
-	for (int i = 0; i <= 300; i++){
-		double angle = 2 * M_PI * i / 300;
-		double x = cos(angle);
-		double y = sin(angle);
-		glVertex2d(x, y);
+	for (int i = 0; i<360; i++){
+		float degInRad = i*DEGINRAD;
+		glVertex3f(cos(degInRad)*r + dx, 0, sin(degInRad)*r + dy);
+		glVertex3f(cos(degInRad)*r + dx, sin(degInRad)*r + dy ,0);
 	}
 	glEnd();
+	glPopMatrix();
+	glColor3f(1.0, 0.3, 0.3);
 }
+
 
 //시계추
 void watchBottom()
-{	
+{
 	glLineWidth(10);
 	glColor3f(0.0, 0.0, 1.0);
 	glBegin(GL_LINE_STRIP);
@@ -82,7 +91,7 @@ void watchBottom()
 
 void watchCircleofbottom()
 {
-	drawCircle(1000);
+	drawCircle(10);
 }
 
 void MyDisplay(void){
@@ -99,7 +108,7 @@ void MyDisplay(void){
 	createcircle(100, 50, 100);
 	glColor3f(0.0f, 0.0f, 0.0f);
 	//glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
-	
+
 	//시계줄
 	watchBottom();
 
