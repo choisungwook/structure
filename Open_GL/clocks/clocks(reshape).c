@@ -7,11 +7,21 @@
 #include <stdio.h>
 #define M_PI 3.14
 
+typedef struct
+{
+	float x;
+	float y;
+}CIRCLE;
+
+
 const int windowWidth = 600, windowHeight = 600;
 const int scaleX = 0, scaleY = 40;
+const float  watchTop = -50.0, watchBot = -10.0f;
+const int watchline = watchTop - watchBot;
 const float clockR = 80.0f, clockVol = 100.0f, angle1min = M_PI / 30.0f,
 minStart = 0.9f, minEnd = 1.0f, stepStart = 0.8f, stepEnd = 1.0f;
 
+CIRCLE circle;
 
 //시, 분, 초 시계바늘 변수
 float angleHour = 0, angleMin = 0, angleSec = 0;
@@ -27,13 +37,6 @@ void newLine(float rStart, float rEnd, float angle){
 	glVertex2f(clockR*rEnd*c + scaleX, clockR*rEnd*s + scaleY);
 }
 
-typedef struct
-{
-	float x;
-	float y;
-}CIRCLE;
-
-CIRCLE circle;
 
 //원을 그리는 함수
 //cos, sin함수를 이용해 1,2,3,4분면을 각각 그린다.
@@ -53,17 +56,33 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
-void createbottom()
+void drawCircle(float radius)
 {
-	//시계추
+	glBegin(GL_LINE_LOOP);
+	for (int i = 0; i <= 300; i++){
+		double angle = 2 * M_PI * i / 300;
+		double x = cos(angle);
+		double y = sin(angle);
+		glVertex2d(x, y);
+	}
+	glEnd();
+}
+
+//시계추
+void watchBottom()
+{	
 	glLineWidth(10);
 	glColor3f(0.0, 0.0, 1.0);
 	glBegin(GL_LINE_STRIP);
-	glVertex2f(0.0, -50.0);
-
-	glVertex2f(0.0, -10.0);
+	glVertex2f(0.0, watchTop);
+	glVertex2f(0.0, watchBot);
 	glEnd();
 	glLineWidth(2.0f);
+}
+
+void watchCircleofbottom()
+{
+	drawCircle(1000);
 }
 
 void MyDisplay(void){
@@ -81,7 +100,11 @@ void MyDisplay(void){
 	glColor3f(0.0f, 0.0f, 0.0f);
 	//glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
 	
-	createbottom();
+	//시계줄
+	watchBottom();
+
+	//시계라인
+	watchCircleofbottom();
 
 	//시계 시, 분, 초 눈금을 그리는 newLine함수를 호출하고
 	//5간격마다 구별을 하기 위해 해당 눈금은 빨간색으로 그린다.
