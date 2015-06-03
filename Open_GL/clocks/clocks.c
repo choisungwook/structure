@@ -4,6 +4,7 @@
 #include <time.h>
 #include <sys/timeb.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define M_PI 3.14
 
@@ -56,16 +57,6 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
-void createrectangle(int x1, int y1, int x2, int y2)
-{
-	glBegin(GL_POLYGON);
-		glVertex2f(x1, y1);
-		glVertex2f(x1, y2);
-		glVertex2f(x2, y2);
-		glVertex2f(x2, y1);
-	glEnd();
-}
-
 void RenderScene(void){
 	int i;
 
@@ -77,10 +68,14 @@ void RenderScene(void){
 	glEnable(GL_POLYGON_SMOOTH);
 
 	createcircle(100, 50, 100);
-	createrectangle(-0.2, 0.1, 0.4, 0.4);
+	//createrectangle(-0.2, 0.1, 0.4, 0.4);
+	glRectf(-0.5f, 0.5f, 0.5f, -0.5f);
+
+	//시계 시, 분, 초 눈금을 그린다
 	glBegin(GL_LINES);
 	for (i = 0; i<60; i++){
-		if (i % 5){ // normal minute
+		//i가 5의 배수가 되면 5분씩의 눈금이다.
+		if (i % 5){ 
 			if (i % 5 == 1)
 				glColor3f(0.0f, 0.0f, 0.0f);
 			newLine(minStart, minEnd, i*angle1min);
@@ -92,14 +87,33 @@ void RenderScene(void){
 	}
 	glEnd();
 
-	glFlush();
+	//시간과 분을을 가르키는 시계바늘 그린다
+	glLineWidth(3.0f);
+	glBegin(GL_LINES);
+	newLine(0.0f, 0.5f, -angleHour + M_PI / 2);
+	newLine(0.0f, 0.8f, -angleMin + M_PI / 2);
+	glEnd();
+
+
+	//초를 가르키는 시계바늘을 그린다.
+	glLineWidth(1.0f);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glBegin(GL_LINES);
+	newLine(0.0f, 0.8f, -angleSec + M_PI / 2);
+	glEnd();
+	
+	//더블버퍼링을 사용한다.
+	glutSwapBuffers();
 }
 
 ///////////////////////////////////////////////////////////
-// Called by GLUT library when the window has chanaged size
-void ChangeSize(GLsizei w, GLsizei h){
+//Reshape함수를 정의한다
+//Reshape함수를 정의한 이유는 창의 크기를 변경시 
+//비율을 유지하기 위함이다.
+void MyReshape(GLsizei w, GLsizei h){
 	GLfloat aspectRatio;
 
+	printf("가로창 크기 : %d 세로창 크기 :%d\n", w, h);
 	// Prevent a divide by zero
 	if (h == 0)
 		h = 1;
@@ -124,6 +138,7 @@ void ChangeSize(GLsizei w, GLsizei h){
 
 int main(int argc, char* argv[]){
 	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(windowWidth, windowHeight);
 	glutInitWindowPosition(0, 0);
 
@@ -134,7 +149,7 @@ int main(int argc, char* argv[]){
 
 	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 	glutDisplayFunc(RenderScene);
-	glutReshapeFunc(ChangeSize);
+	glutReshapeFunc(MyReshape);
 	glutMainLoop();
 
 	return 0;
