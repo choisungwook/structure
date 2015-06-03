@@ -53,6 +53,19 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
+void createbottom()
+{
+	//시계추
+	glLineWidth(10);
+	glColor3f(0.0, 0.0, 1.0);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(0.0, -50.0);
+
+	glVertex2f(0.0, -10.0);
+	glEnd();
+	glLineWidth(2.0f);
+}
+
 void MyDisplay(void){
 	int i;
 
@@ -66,7 +79,9 @@ void MyDisplay(void){
 	//시계테두리 원을 그린다
 	createcircle(100, 50, 100);
 	glColor3f(0.0f, 0.0f, 0.0f);
-	glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
+	//glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
+	
+	createbottom();
 
 	//시계 시, 분, 초 눈금을 그리는 newLine함수를 호출하고
 	//5간격마다 구별을 하기 위해 해당 눈금은 빨간색으로 그린다.
