@@ -57,7 +57,7 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
-void RenderScene(void){
+void MyDisplay(void){
 	int i;
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]){
 	glLoadIdentity();
 
 	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
-	glutDisplayFunc(RenderScene);
+	glutDisplayFunc(MyDisplay);
 	glutReshapeFunc(MyReshape);
 	glutMainLoop();
 
