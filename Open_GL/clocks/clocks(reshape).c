@@ -8,8 +8,9 @@
 #define M_PI 3.14
 
 const int windowWidth = 600, windowHeight = 600;
+const int scaleX = 0, scaleY = 40;
 const float clockR = 80.0f, clockVol = 100.0f, angle1min = M_PI / 30.0f,
-			minStart = 0.9f, minEnd = 1.0f, stepStart = 0.8f, stepEnd = 1.0f;
+minStart = 0.9f, minEnd = 1.0f, stepStart = 0.8f, stepEnd = 1.0f;
 
 
 //시, 분, 초 시계바늘 변수
@@ -21,8 +22,9 @@ float angleHour = 0, angleMin = 0, angleSec = 0;
 //회전하면서 눈금을 그린다.
 void newLine(float rStart, float rEnd, float angle){
 	float c = cos(angle) / 2, s = sin(angle) / 2;
-	glVertex2f(clockR*rStart*c, clockR*rStart*s);
-	glVertex2f(clockR*rEnd*c, clockR*rEnd*s);
+
+	glVertex2f(clockR*rStart*c + scaleX, clockR*rStart*s + scaleY);
+	glVertex2f(clockR*rEnd*c + scaleX, clockR*rEnd*s + scaleY);
 }
 
 typedef struct
@@ -40,12 +42,12 @@ void createcircle(int k, int r, int h) {
 	glBegin(GL_QUADS);
 	for (float i = 0; i < 180; i++)
 	{
-		circle.x = r * cos(i) - h;
-		circle.y = r * sin(i) + k;
+		circle.x = r * cos(i) - h + scaleX;
+		circle.y = r * sin(i) + k + scaleY;
 		glVertex3f(circle.x + k, circle.y - h, 0);
 
-		circle.x = r * cos(i + 0.1) - h;
-		circle.y = r * sin(i + 0.1) + k;
+		circle.x = r * cos(i + 0.1) - h + scaleX;
+		circle.y = r * sin(i + 0.1) + k + scaleY;
 		glVertex3f(circle.x + k, circle.y - h, 0);
 	}
 	glEnd();
@@ -62,7 +64,7 @@ void MyDisplay(void){
 	glEnable(GL_POLYGON_SMOOTH);
 
 	//시계테두리 원을 그린다
-	createcircle(100, 50, 100);	
+	createcircle(100, 50, 100);
 	glColor3f(0.0f, 0.0f, 0.0f);
 	glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
 
@@ -71,7 +73,7 @@ void MyDisplay(void){
 	glBegin(GL_LINES);
 	for (i = 0; i<60; i++){
 		//i가 5의 배수가 되면 5분씩의 눈금이다.
-		if (i % 5){ 
+		if (i % 5){
 			if (i % 5 == 1)
 				glColor3f(0.0f, 0.0f, 0.0f);
 			newLine(minStart, minEnd, i*angle1min);
@@ -97,7 +99,7 @@ void MyDisplay(void){
 	glBegin(GL_LINES);
 	newLine(0.0f, 0.8f, -angleSec + M_PI / 2);
 	glEnd();
-	
+
 	//더블버퍼링을 사용한다.
 	glutSwapBuffers();
 }
@@ -115,7 +117,7 @@ void MyReshape(GLsizei w, GLsizei h){
 		h = 1;
 
 	// Set Viewport to window dimensions
-	glViewport(0, h / 4, w, h);
+	glViewport(0, 0, w, h);
 
 	// Reset coordinate system
 	glMatrixMode(GL_PROJECTION);
@@ -163,7 +165,7 @@ int main(int argc, char* argv[]){
 
 	glutCreateWindow("20094422 최성욱 시계바늘 레포트");
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-	
+
 	//콜백함수 등록
 	glutDisplayFunc(MyDisplay);
 	glutReshapeFunc(MyReshape);
