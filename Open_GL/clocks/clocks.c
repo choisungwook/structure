@@ -5,28 +5,20 @@
 #include <sys/timeb.h>
 #include <stdlib.h>
 #include <stdio.h>
-
 #define M_PI 3.14
 
-const float clockR = 80.0f,
-clockVol = 100.0f,
-
-angle1min = M_PI / 30.0f,
-
-minStart = 0.9f,
-minEnd = 1.0f,
-
-stepStart = 0.8f,
-stepEnd = 1.0f;
-
-const int windowWidth = 600,
-windowHeight = 600;
-
-float angleHour = 0,
-angleMin = 0,
-angleSec = 0;
+const int windowWidth = 600, windowHeight = 600;
+const float clockR = 80.0f, clockVol = 100.0f, angle1min = M_PI / 30.0f,
+			minStart = 0.9f, minEnd = 1.0f, stepStart = 0.8f, stepEnd = 1.0f;
 
 
+//시, 분, 초 시계바늘 변수
+float angleHour = 0, angleMin = 0, angleSec = 0;
+
+
+//시, 분, 초 눈금을 그리는데 사용되는 함수
+//이 함수는 동쪽부터 시작해서 북, 서, 남, 동으로 반시계방향으로
+//회전하면서 눈금을 그린다.
 void newLine(float rStart, float rEnd, float angle){
 	float c = cos(angle) / 2, s = sin(angle) / 2;
 	glVertex2f(clockR*rStart*c, clockR*rStart*s);
@@ -71,7 +63,8 @@ void MyDisplay(void){
 	//createrectangle(-0.2, 0.1, 0.4, 0.4);
 	glRectf(-0.5f, 0.5f, 0.5f, -0.5f);
 
-	//시계 시, 분, 초 눈금을 그린다
+	//시계 시, 분, 초 눈금을 그리는 newLine함수를 호출하고
+	//5간격마다 구별을 하기 위해 해당 눈금은 빨간색으로 그린다.
 	glBegin(GL_LINES);
 	for (i = 0; i<60; i++){
 		//i가 5의 배수가 되면 5분씩의 눈금이다.
