@@ -49,6 +49,8 @@ void createcircle(int k, int r, int h) {
 	glEnd();
 }
 
+
+
 void MyDisplay(void){
 	int i;
 
@@ -59,9 +61,8 @@ void MyDisplay(void){
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
 
-	createcircle(100, 50, 100);
-	//createrectangle(-0.2, 0.1, 0.4, 0.4);
-	glRectf(-0.5f, 0.5f, 0.5f, -0.5f);
+	createcircle(100, 50, 100);	
+	glRectf(-0.0f, 1.0f, 0.5f, -0.5f);
 
 	//시계 시, 분, 초 눈금을 그리는 newLine함수를 호출하고
 	//5간격마다 구별을 하기 위해 해당 눈금은 빨간색으로 그린다.
@@ -80,7 +81,7 @@ void MyDisplay(void){
 	}
 	glEnd();
 
-	//시간과 분을을 가르키는 시계바늘 그린다
+	//시간과 분을 가르키는 시계바늘 그린다
 	glLineWidth(3.0f);
 	glBegin(GL_LINES);
 	newLine(0.0f, 0.5f, -angleHour + M_PI / 2);
@@ -129,6 +130,29 @@ void MyReshape(GLsizei w, GLsizei h){
 	glLoadIdentity();
 }
 
+
+//시, 분, 초 시계바늘이 현재시간을 가르키게 하는 타이머 함수이다.
+
+void TimerFunction(int value){
+	struct timeb tb;
+	time_t tim = time(0);
+	struct tm* t;
+
+	//표준함수인 localtime을 이용해 time_t 구조체 변수에 시간을 저장한다.
+	t = localtime(&tim);
+	//timeb 구조체 구조에 맞게 변경한다.
+	ftime(&tb);
+
+	angleSec = (float)(t->tm_sec + (float)tb.millitm / 1000.0f) / 30.0f * M_PI;
+	angleMin = (float)(t->tm_min) / 30.0f * M_PI + angleSec / 60.0f;
+	angleHour = (float)(t->tm_hour > 12 ? t->tm_hour - 12 : t->tm_hour) / 6.0f * M_PI +
+		angleMin / 12.0f;
+
+	//MyDisplay함수를 호출한 후 Timer을 재 호출한다.
+	glutPostRedisplay();
+	glutTimerFunc(33, TimerFunction, 1);
+}
+
 int main(int argc, char* argv[]){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -137,12 +161,11 @@ int main(int argc, char* argv[]){
 
 	glutCreateWindow("20094422 최성욱 시계바늘 레포트");
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+	
+	//콜백함수 등록
 	glutDisplayFunc(MyDisplay);
 	glutReshapeFunc(MyReshape);
+	glutTimerFunc(30, TimerFunction, 1);
 	glutMainLoop();
 
 	return 0;
