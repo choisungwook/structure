@@ -25,11 +25,11 @@ int main()
 	for (int i = 0; i < endX+result; i++)
 	{
 		if (i == endX + result-1)
-			fprintf(fout, "%d ", i);
+			fprintf(fout, "%d", i);
 		else
 			fprintf(fout, "%d, ", i);		
 	}
-
+	fprintf(fout, "}\n");
 	fprintf(fout, "%d\n", result);
 	fclose(fout);
 	return 0;
