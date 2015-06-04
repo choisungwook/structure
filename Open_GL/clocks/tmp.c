@@ -9,18 +9,13 @@
 #define M_PI 3.14
 #define DEGINRAD 3.14 / 180
 
-int dx = 0, dy = -60;
-int moveX, moveY = -60, p;
-int moveDirection = 0;
-int rightX[10000], rightXIndex;
-int rightY[10000], rightYIndex;
+float dx = 0, dy = -60;
 int index = -1;
-int standX = 10;
-const int jumEnd = 21;
+const int jumEnd = 78;
+const int jump = 3;
 
-int valueOfX[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
-					
-int valueOfY[] = { -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40 };
+int valueOfX[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1 };
+int valueOfY[] = { -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -41, -42, -43, -44, -45, -46, -47, -48, -49, -50, -51, -52, -53, -54, -55, -56, -57, -58, -59, -60, -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -41, -42, -43, -44, -45, -46, -47, -48, -49, -50, -51, -52, -53, -54, -55, -56, -57, -58, -59, -60 };
 
 typedef struct
 {
@@ -43,10 +38,12 @@ float angleHour = 0, angleMin = 0, angleSec = 0;
 
 int getIndex(int index)
 {
-	if (index + 3 >= jumEnd)
+	if (index + jump >= jumEnd)
 		return 0;
-	else index + 3;
+	else index + jump;
 }
+
+
 /////////////////// 그리기 함수에 관련 모듈 ////////////////////////////
 //시, 분, 초 눈금을 그리는데 사용되는 함수
 //이 함수는 동쪽부터 시작해서 북, 서, 남, 동으로 반시계방향으로
@@ -97,26 +94,21 @@ void drawCircle(const float r){
 
 //////////////////// UI 구성 모듈 ///////////////////////
 
-
-//시계추
-void watchBottom()
-{
-glLineWidth(10);
-glColor3f(0.0, 0.0, 1.0);
-glBegin(GL_LINE_STRIP);
-glVertex2f(0.0, watchTop);
-glVertex2f(0.0, watchBot);
-glEnd();
-glLineWidth(2.0f);
-}
-
-
 void watchCircleofbottom()
 {	
 	index = getIndex(index);
 
 	dx = valueOfX[index];
 	dy = valueOfY[index];
+
+	glLineWidth(10);
+	glColor3f(0.0, 0.0, 1.0);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(dx, watchTop);
+	glVertex2f(0.0, watchBot);
+	glEnd();
+	glLineWidth(2.0f);
+
 	drawCircle(10);
 }
 
@@ -134,11 +126,8 @@ void MyDisplay(void){
 	createcircle(100, 50, 100);
 	glColor3f(0.0f, 0.0f, 0.0f);
 	//glRectf(-0.5f, -50.0f, 0.5f, -100.0f);
-
-	//시계줄
-	watchBottom();
-
-	//시계라인
+	
+	//시계추
 	watchCircleofbottom();
 
 	//시계 시, 분, 초 눈금을 그리는 newLine함수를 호출하고
@@ -238,7 +227,7 @@ int main(int argc, char* argv[]){
 
 	glutCreateWindow("20094422 최성욱 시계바늘 레포트");
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-		
+
 	//콜백함수 등록
 	glutDisplayFunc(MyDisplay);
 	glutReshapeFunc(MyReshape);
@@ -250,7 +239,7 @@ int main(int argc, char* argv[]){
 
 int h = 0.05;
 float t, v;
-const int x = 30 * M_PI /180;
+const int x = 30 * M_PI / 180;
 float pen_fm = 0.01, pen_m = 0.1, pen_l = 100 * 0.01, pen_j = 0.02, pen_g = 9.8;
 int gndCenterX = 150, gndConterY = 20;
 float penLoength = pen_l * 100 * 2;
@@ -261,14 +250,14 @@ float calcCodeFunc(float tVal, float xVal, float vVal)
 	return -pen_fm / (pen_m*pen_l*pen_l + pen_j)*vVal - pen_m*pen_g*pen_l / (pen_m*pen_l*pen_l + pen_j)*xVal;
 }
 
-void GetPath(float t, float x, float v,float *ResultOfx, float *ResultOfy)
+void GetPath(float t, float x, float v, float *ResultOfx, float *ResultOfy)
 {
 	float kx1 = v;
 	float kv1 = calcCodeFunc(t, x, v);
 
 	float kx2 = v + h*kv1 / 2;
 	float kv2 = calcCodeFunc(t + h / 2, x + h*kx1 / 2, v + h*kv1 / 2);
-	
+
 	float kx3 = v + h*kv1 / 2;
 	float kv3 = calcCodeFunc(t + h / 2, x + h*kx2 / 2, v + h*kv2 / 2);
 
@@ -276,7 +265,7 @@ void GetPath(float t, float x, float v,float *ResultOfx, float *ResultOfy)
 	float kv4 = calcCodeFunc(t + h, x + h*kx3, v + h*kv3);
 
 	*ResultOfx = h*(kx1 + 2 * kx2 + 2 * kx3 + kx4) / 6;
-	*ResultOfy = h*(kv1 + 2 * kv2 + 2 * kv3 + kv4) / 6;	
+	*ResultOfy = h*(kv1 + 2 * kv2 + 2 * kv3 + kv4) / 6;
 }
 
 void loop()
@@ -284,7 +273,7 @@ void loop()
 	float DX = 0, DY = 0;
 	t += h;
 
-	GetPath(t, x, v,&DX,&DY);
+	GetPath(t, x, v, &DX, &DY);
 
 	printf("%lf %lf\n", DX, DY);
 }
