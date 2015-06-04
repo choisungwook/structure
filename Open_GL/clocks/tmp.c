@@ -16,9 +16,11 @@ int rightX[10000], rightXIndex;
 int rightY[10000], rightYIndex;
 int index = -1;
 int standX = 10;
-int valueOfX[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+const int jumEnd = 21;
+
+int valueOfX[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 					
-int valueOfY[] = { -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40, -39, -38, -37, -36, -35 };
+int valueOfY[] = { -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40 };
 
 typedef struct
 {
@@ -41,9 +43,9 @@ float angleHour = 0, angleMin = 0, angleSec = 0;
 
 int getIndex(int index)
 {
-	if (index + 4 >= 26)
+	if (index + 3 >= jumEnd)
 		return 0;
-	else index + 4;
+	else index + 3;
 }
 /////////////////// 그리기 함수에 관련 모듈 ////////////////////////////
 //시, 분, 초 눈금을 그리는데 사용되는 함수
