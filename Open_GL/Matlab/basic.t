@@ -1,8 +1,11 @@
-Enter file contents hereF = imread('path');
-figure,imshow(F);
+path = ('c:\show.jpg');
+RGB = imread(path)
+% figure, imshow(RGB);
 
-G = rgb2gray(F);
-figure,imshow(F);
+G = rgb2gray(RGB);
+% figure,imshow(G);
 
-M = 255-G
-figure,imshow(F);
+[r,c] = size(G);
+x = 1:c;
+plot(x, G(26,:))
+
